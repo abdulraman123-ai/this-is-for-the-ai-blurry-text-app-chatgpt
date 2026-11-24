@@ -19,6 +19,7 @@ const nextConfig = {
       fs: { browser: "./lib/empty-node-module.ts" },
       path: { browser: "./lib/empty-node-module.ts" },
       "ort.bundle.min.mjs": "onnxruntime-web/dist/ort.bundle.min.mjs",
+      "./assets/worker-entry-C9UNuyOJ.js": "./lib/empty-paddle-worker.ts",
     },
   },
   async headers() {
