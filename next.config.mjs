@@ -20,7 +20,6 @@ const nextConfig = {
       path: { browser: "./lib/empty-node-module.ts" },
       crypto: { browser: "./lib/empty-node-module.ts" },
       "ort.bundle.min.mjs": "./lib/empty-node-module.ts",
-      "./assets/worker-entry-C9UNuyOJ.js": "./lib/empty-paddle-worker.ts",
     },
   },
   async headers() {
