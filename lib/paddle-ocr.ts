@@ -39,7 +39,7 @@ export type PaddleOcrEngine = {
 export async function createPaddleOcr(language: PaddleLanguage): Promise<PaddleOcrEngine> {
   const { PaddleOCR } = await import("@paddleocr/paddleocr-js");
   const engine = await PaddleOCR.create({
-    worker: false,
+    worker: true,
     lang: language,
     ocrVersion: "PP-OCRv6",
     ortOptions: {
