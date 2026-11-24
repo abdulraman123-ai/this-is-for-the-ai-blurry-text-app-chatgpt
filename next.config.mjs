@@ -13,6 +13,13 @@ const securityHeaders = [
 const nextConfig = {
   poweredByHeader: false,
   compress: true,
+  turbopack: {
+    root: process.cwd(),
+    resolveAlias: {
+      fs: { browser: "./lib/empty-node-module.ts" },
+      path: { browser: "./lib/empty-node-module.ts" },
+    },
+  },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },
