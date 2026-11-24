@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, DragEvent, useCallback, useEffect, useRef, useState } from "react";
+import { ChangeEvent, ClipboardEvent, DragEvent, useCallback, useEffect, useRef, useState } from "react";
 import {
   ArrowDownToLine, Check, Clipboard, FileImage, FileText, ImagePlus, LoaderCircle,
   LockKeyhole, ScanText, Sparkles, UploadCloud, WandSparkles, X
@@ -722,7 +722,7 @@ export function ClearTextWorkspace() {
     };
   }, []);
 
-  const handlePaste = (event: React.ClipboardEvent<HTMLElement>) => {
+  const handlePaste = (event: ClipboardEvent<HTMLElement>) => {
     const file = Array.from(event.clipboardData.files).find((item) => item.type.startsWith("image/"));
     if (file) void addFile(file);
   };
