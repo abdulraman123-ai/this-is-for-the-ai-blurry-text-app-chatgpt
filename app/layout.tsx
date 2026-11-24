@@ -7,7 +7,8 @@ export const metadata: Metadata = {
     "Enhance blurry document photos, run OCR, and copy or download extracted text. Processing happens locally in your browser.",
   applicationName: "ClearText AI",
   keywords: ["blurry text", "document enhancement", "OCR", "scan cleanup", "text extraction"],
-  robots: { index: true, follow: true },\n  icons: { icon: "/icon.svg", shortcut: "/icon.svg" },
+  robots: { index: true, follow: true },
+  icons: { icon: "/icon.svg", shortcut: "/icon.svg" },
   openGraph: {
     title: "ClearText AI",
     description: "Turn difficult-to-read document photos into clearer scans and usable text.",
