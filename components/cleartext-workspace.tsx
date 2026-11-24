@@ -162,7 +162,8 @@ async function loadPdfPages(file: File) {
   pdfjs.GlobalWorkerOptions.workerSrc =
     "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/" + pdfjs.version + "/pdf.worker.min.mjs";
   const bytes = new Uint8Array(await file.arrayBuffer());
-  const pdf = await pdfjs.getDocument({ data: bytes }).promise;
+  const loadingTask = pdfjs.getDocument({ data: bytes });
+  const pdf = await loadingTask.promise;
   const total = Math.min(pdf.numPages, MAX_PDF_PAGES);
   const pages: { canvas: HTMLCanvasElement; embeddedText: string }[] = [];
 
@@ -181,7 +182,7 @@ async function loadPdfPages(file: File) {
       pages.push({ canvas, embeddedText });
     }
   } finally {
-    await pdf.destroy();
+    await loadingTask.destroy();
   }
 
   return { pages, totalPages: pdf.numPages, processedPages: total };
