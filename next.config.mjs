@@ -18,7 +18,8 @@ const nextConfig = {
     resolveAlias: {
       fs: { browser: "./lib/empty-node-module.ts" },
       path: { browser: "./lib/empty-node-module.ts" },
-      "ort.bundle.min.mjs": "onnxruntime-web/dist/ort.bundle.min.mjs",
+      crypto: { browser: "./lib/empty-node-module.ts" },
+      "ort.bundle.min.mjs": "./lib/empty-node-module.ts",
       "./assets/worker-entry-C9UNuyOJ.js": "./lib/empty-paddle-worker.ts",
     },
   },
