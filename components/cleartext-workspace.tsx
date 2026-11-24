@@ -109,6 +109,7 @@ function enhanceCanvas(source: HTMLCanvasElement, strength: number) {
   const output = context.createImageData(canvas.width, canvas.height);
   const input = original.data;
   const out = output.data;
+  out.set(input);
   const amount = 0.35 + strength * 0.9;
   for (let y = 1; y < canvas.height - 1; y += 1) {
     for (let x = 1; x < canvas.width - 1; x += 1) {
@@ -190,7 +191,7 @@ function downloadBlob(blob: Blob, filename: string) {
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();
-  URL.revokeObjectURL(url);
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 export function ClearTextWorkspace() {
