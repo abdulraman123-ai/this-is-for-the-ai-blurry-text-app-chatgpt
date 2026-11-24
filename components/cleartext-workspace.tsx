@@ -613,7 +613,7 @@ export function ClearTextWorkspace() {
               const prepared = prepareOcrCanvas(pages[pageIndex].enhancedCanvas);
               const result = await worker.recognize(prepared);
               pageTexts.set(pageIndex, result.data.text.trim());
-              lineCount += result.data.lines?.length ?? 0;
+              lineCount += result.data.text.split(/\\r?\\n/).filter((line) => line.trim().length > 0).length;
               if (typeof result.data.confidence === "number") {
                 confidenceScores.push(result.data.confidence / 100);
               }
