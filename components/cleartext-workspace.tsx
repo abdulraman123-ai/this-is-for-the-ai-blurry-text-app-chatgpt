@@ -590,6 +590,14 @@ export function ClearTextWorkspace() {
           } catch {
             paddleFailed = true;
             for (const pageIndex of scannedPageIndexes) pageTexts.delete(pageIndex);
+            if (paddleRef.current) {
+              try {
+                await paddleRef.current.engine.dispose();
+              } catch {
+                // Continue to the fallback even if the failed OCR session cannot be disposed.
+              }
+              paddleRef.current = null;
+            }
             lineCount = 0;
             lowConfidenceLines = 0;
             confidenceScores.length = 0;
