@@ -242,14 +242,23 @@ async function runNafNet(source: HTMLCanvasElement, onProgress: (value: number) 
 
   try {
     onProgress(35);
+    // NAFNet's exported ONNX graph requires square inference input in the browser.
+    // Keep the document's aspect ratio, pad the unused area with white, then crop it
+    // back out after inference so the saved result keeps the original page geometry.
     const maxSize = 512;
     const scale = Math.min(1, maxSize / Math.max(source.width, source.height));
-    const width = Math.max(16, Math.floor(source.width * scale / 8) * 8);
-    const height = Math.max(16, Math.floor(source.height * scale / 8) * 8);
+    const contentWidth = Math.max(16, Math.floor(source.width * scale / 8) * 8);
+    const contentHeight = Math.max(16, Math.floor(source.height * scale / 8) * 8);
+    const width = maxSize;
+    const height = maxSize;
+    const offsetX = Math.floor((width - contentWidth) / 2);
+    const offsetY = Math.floor((height - contentHeight) / 2);
     const inputCanvas = makeCanvas(width, height);
     const inputContext = inputCanvas.getContext("2d", { willReadFrequently: true });
     if (!inputContext) throw new Error("Could not prepare the AI model input.");
-    inputContext.drawImage(source, 0, 0, width, height);
+    inputContext.fillStyle = "#ffffff";
+    inputContext.fillRect(0, 0, width, height);
+    inputContext.drawImage(source, offsetX, offsetY, contentWidth, contentHeight);
     const pixels = inputContext.getImageData(0, 0, width, height).data;
     const planar = new Float32Array(3 * width * height);
     const plane = width * height;
@@ -277,7 +286,11 @@ async function runNafNet(source: HTMLCanvasElement, onProgress: (value: number) 
     const finalCanvas = makeCanvas(source.width, source.height);
     const finalContext = finalCanvas.getContext("2d");
     if (!finalContext) throw new Error("Could not resize the AI result.");
-    finalContext.drawImage(outputCanvas, 0, 0, source.width, source.height);
+    finalContext.drawImage(
+      outputCanvas,
+      offsetX, offsetY, contentWidth, contentHeight,
+      0, 0, source.width, source.height
+    );
     onProgress(100);
     return finalCanvas;
   } finally {
