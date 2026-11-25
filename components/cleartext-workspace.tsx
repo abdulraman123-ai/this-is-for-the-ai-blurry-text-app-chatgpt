@@ -524,11 +524,11 @@ export function ClearTextWorkspace() {
       let lineCount = 0;
       let lowConfidenceLines = 0;
       let engineLabel = pdfTextPages ? "PDF text layer" : "PaddleOCR PP-OCRv6";
+      let paddleFailureReason = "";
 
       if (scannedPageIndexes.length) {
         let paddleEngine: PaddleOcrEngine | null = null;
         let paddleFailed = false;
-        let paddleFailureReason = "";
         try {
           announce(
             "Preparing local OCR. First use downloads the PaddleOCR model (about 31 MB); it is cached by your browser."
