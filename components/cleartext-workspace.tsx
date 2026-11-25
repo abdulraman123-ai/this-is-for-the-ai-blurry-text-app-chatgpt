@@ -528,13 +528,16 @@ export function ClearTextWorkspace() {
       if (scannedPageIndexes.length) {
         let paddleEngine: PaddleOcrEngine | null = null;
         let paddleFailed = false;
+        let paddleFailureReason = "";
         try {
           announce(
             "Preparing local OCR. First use downloads the PaddleOCR model (about 31 MB); it is cached by your browser."
           );
           paddleEngine = await getPaddleEngine();
-        } catch {
+        } catch (error) {
           paddleFailed = true;
+          paddleFailureReason = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+          console.error("[ClearText AI] PaddleOCR initialization failed:", error);
           engineLabel = pdfTextPages ? "PDF text + Tesseract backup" : "Tesseract backup";
         }
 
@@ -587,8 +590,10 @@ export function ClearTextWorkspace() {
               });
               setProgress(Math.round(((position + 1) / scannedPageIndexes.length) * 100));
             }
-          } catch {
+          } catch (error) {
             paddleFailed = true;
+            paddleFailureReason = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+            console.error("[ClearText AI] PaddleOCR prediction failed:", error);
             for (const pageIndex of scannedPageIndexes) pageTexts.delete(pageIndex);
             if (paddleRef.current) {
               try {
@@ -606,7 +611,7 @@ export function ClearTextWorkspace() {
         }
 
         if (paddleFailed) {
-          announce("PaddleOCR could not load from its model host. Switching to the local Tesseract backup...");
+          announce("PaddleOCR failed (" + paddleFailureReason + "). Switching to the local Tesseract backup...");
           const { createWorker } = await import("tesseract.js");
           const languageCode = OCR_LANGUAGES.find((language) => language.value === ocrLanguage)?.tess ?? "eng";
           const worker = await createWorker(languageCode, 1, {
@@ -621,7 +626,7 @@ export function ClearTextWorkspace() {
               const prepared = prepareOcrCanvas(pages[pageIndex].enhancedCanvas);
               const result = await worker.recognize(prepared);
               pageTexts.set(pageIndex, result.data.text.trim());
-              lineCount += result.data.text.split(/\\r?\\n/).filter((line) => line.trim().length > 0).length;
+              lineCount += result.data.text.split(/\r?\n/).filter((line) => line.trim().length > 0).length;
               if (typeof result.data.confidence === "number") {
                 confidenceScores.push(result.data.confidence / 100);
               }
@@ -661,12 +666,15 @@ export function ClearTextWorkspace() {
         announce("No readable text was found. Try a sharper image, better lighting, or a different language.", "error");
       } else if (lowConfidenceLines > 0) {
         announce(
-          "Text extracted. " + lowConfidenceLines + " lines have lower confidence; check them against the original.",
+          "Text extracted. " + lowConfidenceLines + " lines have lower confidence; check them against the original." +
+          (paddleFailureReason ? " PaddleOCR error: " + paddleFailureReason : ""),
           "success"
         );
       } else {
         announce(
           "Text extraction complete. " +
+          (engineLabel.includes("Tesseract backup") ? "Used the Tesseract backup. " : "") +
+          (paddleFailureReason ? "PaddleOCR error: " + paddleFailureReason + ". " : "") +
           (pdfTextPages ? pdfTextPages + " PDF page(s) used selectable text. " : "") +
           "Review names, numbers and dates before using the result.",
           "success"
